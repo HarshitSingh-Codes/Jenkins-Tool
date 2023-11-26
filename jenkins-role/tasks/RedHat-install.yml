@@ -1,0 +1,55 @@
+---
+- name: Include OS-Specific variables
+  ansible.builtin.include_vars:
+    file: "{{ ansible_os_family }}.yml"
+
+- name: Installing Java package...
+  ansible.builtin.yum:
+    name: "{{ java_yum_package }}"
+    state: present
+    update_cache: true
+
+- name: Getting Jenkins.repo file...
+  ansible.builtin.get_url:
+    url: https://pkg.jenkins.io/redhat-stable/jenkins.repo
+    dest: /etc/yum.repos.d/jenkins.repo
+
+- name: Importing Jenkins key from a url...
+  ansible.builtin.rpm_key:
+    state: present
+    key:  https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key
+  
+- name: Updating cache
+  ansible.builtin.yum:
+    update_cache: true
+
+- name: Installing specific Jenkins version...
+  ansible.builtin.yum:
+    name: jenkins-{{ jenkins_version }}
+    state: present
+    update_cache: true
+
+- name: Daemon reloading...
+  ansible.builtin.systemd_service:
+    daemon_reload: true
+    name: jenkins.service
+    state: started
+
+- name: Registering passwd...
+  ansible.builtin.command:
+    cmd: cat /var/lib/jenkins/secrets/initialAdminPassword
+  register: intialPasswd
+
+- name: Display passwd
+  ansible.builtin.debug:
+    var: intialPasswd.stdout
+# /var/lib/jenkins/secrets/initialAdminPassword
+# sudo wget -O /etc/yum.repos.d/jenkins.repo \
+#     https://pkg.jenkins.io/redhat-stable/jenkins.repo
+# /etc/yum.repos.d/jenkins.repo
+# sudo rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key
+# sudo yum upgrade
+# # Add required dependencies for the jenkins package
+# sudo yum install fontconfig java-17-openjdk
+# sudo yum install jenkins
+# sudo systemctl daemon-reload

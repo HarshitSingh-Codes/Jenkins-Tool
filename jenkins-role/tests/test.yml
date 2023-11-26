@@ -1,0 +1,8 @@
+---
+- hosts: tag_Name_redhat2
+  remote_user: ec2-user
+  become: yes
+  gather_facts: yes
+
+  roles:
+    - jenkins
