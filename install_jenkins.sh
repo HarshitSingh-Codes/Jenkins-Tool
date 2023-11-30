@@ -10,4 +10,4 @@ echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins
 
 sudo apt update
 #old version :2.414.1
-sudo apt install -y jenkins=2.414.1
+sudo apt install -y jenkins="2.414.1"
