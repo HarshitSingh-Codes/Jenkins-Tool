@@ -15,10 +15,25 @@ pipeline {
                 sh 'terraform plan'  
             } 
         }
-        stage('Approval'){ 
+        stage('apply Approval'){ 
             steps { 
                 input message: 'Do you want to apply the plan ?', ok: 'Yes' 
             } 
         } 
+        stage('terraform apply'){ 
+            steps { 
+                sh 'terraform apply --auto-approve'  
+            } 
+        }
+        stage('destroy Approval'){ 
+            steps { 
+                input message: 'Do you want to apply the plan ?', ok: 'Yes' 
+            } 
+        } 
+        stage('terraform destroy'){ 
+            steps { 
+                sh 'terraform destroy --auto-approve'  
+            } 
+        }
     } 
 }
