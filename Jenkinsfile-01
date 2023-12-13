@@ -17,7 +17,7 @@ pipeline {
         }
         stage('apply Approval'){ 
             steps { 
-                input message: 'Do you want to apply the plan ?', ok: 'Yes' 
+                input message: 'Do you want to apply the plan?', ok: 'Yes' 
             } 
         } 
         stage('terraform apply'){ 
@@ -27,7 +27,7 @@ pipeline {
         }
         stage('destroy Approval'){ 
             steps { 
-                input message: 'Do you want to apply the plan ?', ok: 'Yes' 
+                input message: 'Do you want to destroy the applied infra?', ok: 'Yes' 
             } 
         } 
         stage('terraform destroy'){ 
