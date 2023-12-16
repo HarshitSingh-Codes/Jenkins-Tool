@@ -16,6 +16,9 @@ pipeline {
             } 
         }
         stage('apply Approval'){ 
+            when {
+                expression { params.ACTION == 'apply' }
+            }
             steps { 
                 input message: 'Do you want to apply the plan?', ok: 'Yes' 
             } 
@@ -26,6 +29,9 @@ pipeline {
             } 
         }
         stage('destroy Approval'){ 
+            when {
+                expression { params.ACTION == 'destroy' }
+            }
             steps { 
                 input message: 'Do you want to destroy the applied infra?', ok: 'Yes' 
             } 
