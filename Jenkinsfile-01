@@ -33,13 +33,18 @@ pipeline {
             steps { 
                 sh 'terraform apply --auto-approve' 
                 sh 'terraform output ' 
-                environment {
+                
+            } 
+        }
+        stage('storing efs dns name'){
+             environment {
                     EFS_DNS_NAME = """${sh(
                     returnStdout: true,
                     script: 'terraform output -raw efs_dns_name').trim()}""" 
                 }
-                sh 'printenv' 
-            } 
+                steps{
+                    sh 'printenv'
+                }
         }
         stage('destroy Approval'){ 
             when {
