@@ -26,9 +26,18 @@ pipeline {
                 input message: 'Do you want to apply the plan?', ok: 'Yes' 
             } 
         } 
-        stage('terraform apply'){ 
+        stage('terraform apply'){
+            when {
+                expression { params.ACTION == 'apply' }
+            } 
             steps { 
-                sh 'terraform apply --auto-approve'  
+                sh 'terraform apply --auto-approve' 
+                sh 'terraform output ' 
+                environment {
+                    EFS_DNS_NAME = """${sh(
+                    returnStdout: true,
+                    script: 'terraform output -raw efs_dns_name').trim()}""" 
+                }
             } 
         }
         stage('destroy Approval'){ 
@@ -40,6 +49,9 @@ pipeline {
             } 
         } 
         stage('terraform destroy'){ 
+            when {
+                expression { params.ACTION == 'destroy' }
+            }
             steps { 
                 // sh 'terraform init'
                 sh 'terraform destroy --auto-approve'  
