@@ -2,6 +2,8 @@ pipeline {
     agent any 
     parameters {
         choice(name: 'ACTION', choices: ['apply', 'destroy'], description: 'Select action: apply or destroy')
+        choice(name: 'TAGS', choices: ['install', 'uninstall'], description: 'Select tags: install or uninstall')
+        choice(name: 'OS', choices: ['ubuntu', 'redhat'], description: 'Select OS family: ubuntu or redhat')
     }
     stages { 
         stage('git checkout') { 
@@ -23,7 +25,7 @@ pipeline {
                 expression { params.ACTION == 'apply' }
             }
             steps { 
-                input message: 'Do you want to apply the plan?', ok: 'Yes' 
+                input message: 'Verify infra. plan before appliction?', ok: 'Yes' 
             } 
         } 
         stage('terraform apply'){
@@ -42,9 +44,62 @@ pipeline {
                     returnStdout: true,
                     script: 'terraform output -raw efs_dns_name').trim()}""" 
                 }
+        }
+        stage('storing ALB DNS name'){
+             environment {
+                    ALB_DNS_NAME = """${sh(
+                    returnStdout: true,
+                    script: 'terraform output -raw jenkins_alb_dns_name').trim()}""" 
+                }
                 steps{
                     sh 'printenv'
                 }
+        }
+
+        stage('Running Ansible') {
+            parallel {
+                stage('Install Jenkins On Ubuntu') {
+                    when {
+                        expression { 
+                            params.TAGS == 'install' && (params.OS == 'ubuntu') 
+                        }
+                    }                    
+                    steps {
+                        sh "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -u ubuntu  ${WORKSPACE}/master.yml --extra-vars \"efs_mount_point=${EFS_DNS_NAME}\" --tags \"install\"" 
+                    }
+                }
+                stage('Uninstall Jenkins On Ubuntu') {
+                    when {
+                        expression { 
+                            params.TAGS == 'uninstall' && (params.OS == 'ubuntu') 
+                        }
+                    }  
+                    steps {
+                        sh "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -u ubuntu  ${WORKSPACE}/master.yml --extra-vars \"efs_mount_point=${EFS_DNS_NAME}\" --tags \"uninstall\"" 
+                    }
+                }
+                stage('Install Jenkins On RedHat') {
+                    when {
+                        expression { 
+                            params.TAGS == 'install' && (params.OS == 'redhat') 
+                        }
+                    }  
+                    steps {
+                        sh "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -u ec2-user  ${WORKSPACE}/master.yml --extra-vars \"efs_mount_point=${EFS_DNS_NAME}\" --tags \"install\"" 
+                    }
+                }
+                stage('Uninstall Jenkins On RedHat') {
+                    when {
+                        expression { 
+                            params.TAGS == 'uninstall' && (params.OS == 'redhat') 
+                        }
+                    }  
+                    steps {
+                        sh "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -u ec2-user  ${WORKSPACE}/master.yml --extra-vars \"efs_mount_point=${EFS_DNS_NAME}\" --tags \"uninstall\"" 
+                    }
+                }
+
+            }
         }
         stage('destroy Approval'){ 
             when {
@@ -59,7 +114,6 @@ pipeline {
                 expression { params.ACTION == 'destroy' }
             }
             steps { 
-                // sh 'terraform init'
                 sh 'terraform destroy --auto-approve'  
             } 
         }
