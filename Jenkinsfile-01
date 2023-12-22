@@ -52,7 +52,7 @@ pipeline {
              environment {
                     ALB_DNS_NAME = """${sh(
                     returnStdout: true,
-                    script: 'terraform output -raw jenkins_alb_dns_name').trim()}""" 
+                    script: 'terraform output jenkins_alb_dns_name').trim()}""" 
                 }
                 steps{
                     sh 'printenv'
