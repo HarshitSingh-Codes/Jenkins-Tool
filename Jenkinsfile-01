@@ -39,6 +39,9 @@ pipeline {
             } 
         }
         stage('storing efs dns name'){
+            when {
+                expression { params.ACTION == 'apply' }
+            }
              environment {
                     EFS_DNS_NAME = """${sh(
                     returnStdout: true,
@@ -49,6 +52,9 @@ pipeline {
                 }
         }
         stage('storing ALB DNS name'){
+            when {
+                expression { params.ACTION == 'apply' }
+            }
              environment {
                     ALB_DNS_NAME = """${sh(
                     returnStdout: true,
@@ -60,6 +66,9 @@ pipeline {
         }
 
         stage('Running Ansible') {
+            when {
+                expression { params.ACTION == 'apply' }
+            }
             parallel {
                 stage('Ansible Graph') {                  
                     steps {
