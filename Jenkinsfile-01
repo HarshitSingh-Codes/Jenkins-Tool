@@ -61,6 +61,11 @@ pipeline {
 
         stage('Running Ansible') {
             parallel {
+                stage('Ansible Graph') {                  
+                    steps {
+                        sh "ansible-inventory --graph"
+                    }
+                }
                 stage('Install Jenkins On Ubuntu') {
                     when {
                         expression { 
