@@ -44,6 +44,9 @@ pipeline {
                     returnStdout: true,
                     script: 'terraform output -raw efs_dns_name').trim()}""" 
                 }
+                steps{
+                    sh 'printenv'
+                }
         }
         stage('storing ALB DNS name'){
              environment {
