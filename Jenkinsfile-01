@@ -73,7 +73,7 @@ pipeline {
                         }
                     }                    
                     steps {
-                        sh "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -u ubuntu  ${WORKSPACE}/master.yml --extra-vars \"efs_mount_point='${EFS_DNS_NAME}'\" --tags \"install\"" 
+                        sh "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -u ubuntu  ${WORKSPACE}/master.yml --extra-vars \"efs_mount_point='${env.EFS_DNS_NAME}'\" --tags \"install\"" 
                     }
                 }
                 stage('Uninstall Jenkins On Ubuntu') {
@@ -83,7 +83,7 @@ pipeline {
                         }
                     }  
                     steps {
-                        sh "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -u ubuntu  ${WORKSPACE}/master.yml --extra-vars \"efs_mount_point='${EFS_DNS_NAME}'\" --tags \"uninstall\"" 
+                        sh "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -u ubuntu  ${WORKSPACE}/master.yml --extra-vars \"efs_mount_point='${env.EFS_DNS_NAME}'\" --tags \"uninstall\"" 
                     }
                 }
                 stage('Install Jenkins On RedHat') {
@@ -93,7 +93,7 @@ pipeline {
                         }
                     }  
                     steps {
-                        sh "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -u ec2-user  ${WORKSPACE}/master.yml --extra-vars \"efs_mount_point='${EFS_DNS_NAME}'\" --tags \"install\"" 
+                        sh "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -u ec2-user  ${WORKSPACE}/master.yml --extra-vars \"efs_mount_point='${env.EFS_DNS_NAME}'\" --tags \"install\"" 
                     }
                 }
                 stage('Uninstall Jenkins On RedHat') {
@@ -103,7 +103,7 @@ pipeline {
                         }
                     }  
                     steps {
-                        sh "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -u ec2-user  ${WORKSPACE}/master.yml --extra-vars \"efs_mount_point='${EFS_DNS_NAME}'\" --tags \"uninstall\"" 
+                        sh "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -u ec2-user  ${WORKSPACE}/master.yml --extra-vars \"efs_mount_point='${env.EFS_DNS_NAME}'\" --tags \"uninstall\"" 
                     }
                 }
 
