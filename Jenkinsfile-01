@@ -5,6 +5,10 @@ pipeline {
         choice(name: 'TAGS', choices: ['install', 'uninstall'], description: 'Select tags: install or uninstall')
         choice(name: 'OS', choices: ['ubuntu', 'redhat'], description: 'Select OS family: ubuntu or redhat')
     }
+    environment {
+        EFS_DNS_NAME = ''
+        ALB_DNS_NAME = ''
+    }
     stages { 
         stage('git checkout') { 
           steps {  
@@ -34,34 +38,33 @@ pipeline {
             } 
             steps { 
                 sh 'terraform apply --auto-approve' 
-                sh 'terraform output ' 
-                
+                sh 'terraform output '     
             } 
+            script {
+                    def efsDnsName = sh(
+                        returnStdout: true,
+                        script: 'terraform output -json efs_dns_name').trim()
+                    def albDnsName = sh(
+                        returnStdout: true,
+                        script: 'terraform output jenkins_alb_dns_name').trim()
+                    env.EFS_DNS_NAME = efsDnsName
+                    env.ALB_DNS_NAME = albDnsName
+                }
         }
-        stage('storing efs dns name'){
+        stage('EFS DNS Name'){
             when {
                 expression { params.ACTION == 'apply' }
             }
-             environment {
-                    EFS_DNS_NAME = """${sh(
-                    returnStdout: true,
-                    script: 'terraform output -raw efs_dns_name').trim()}""" 
-                }
-                steps{
-                    sh 'printenv'
+            steps{
+                    sh 'echo "${env.EFS_DNS_NAME}"'
                 }
         }
-        stage('storing ALB DNS name'){
+        stage('ALB DNS Name'){
             when {
                 expression { params.ACTION == 'apply' }
             }
-             environment {
-                    ALB_DNS_NAME = """${sh(
-                    returnStdout: true,
-                    script: 'terraform output jenkins_alb_dns_name').trim()}""" 
-                }
-                steps{
-                    sh 'printenv'
+            steps{
+                    sh 'echo "${env.ALB_DNS_NAME}"'
                 }
         }
 
