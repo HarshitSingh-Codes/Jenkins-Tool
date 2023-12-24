@@ -40,7 +40,14 @@ pipeline {
                 sh 'terraform apply --auto-approve' 
                 sh 'terraform output '     
             } 
-            script {
+
+        }
+        stage('Store EFS and ALB DNS Name'){
+            when {
+                expression { params.ACTION == 'apply' }
+            }
+            steps{
+                    script {
                     def efsDnsName = sh(
                         returnStdout: true,
                         script: 'terraform output -json efs_dns_name').trim()
@@ -49,21 +56,16 @@ pipeline {
                         script: 'terraform output jenkins_alb_dns_name').trim()
                     env.EFS_DNS_NAME = efsDnsName
                     env.ALB_DNS_NAME = albDnsName
+                    }
+                    
                 }
         }
-        stage('EFS DNS Name'){
+        stage('Print DNS Name'){
             when {
                 expression { params.ACTION == 'apply' }
             }
             steps{
                     sh 'echo "${env.EFS_DNS_NAME}"'
-                }
-        }
-        stage('ALB DNS Name'){
-            when {
-                expression { params.ACTION == 'apply' }
-            }
-            steps{
                     sh 'echo "${env.ALB_DNS_NAME}"'
                 }
         }
