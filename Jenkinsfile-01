@@ -66,8 +66,8 @@ pipeline {
             }
             steps{
                     sh """
-                        echo ${EFS_DNS_NAME} 
-                        echo ${ALB_DNS_NAME}
+                        echo ${env.EFS_DNS_NAME} 
+                        echo ${env.ALB_DNS_NAME}
                     """
                 }
         }
