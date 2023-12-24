@@ -50,7 +50,7 @@ pipeline {
                     script {
                     def efsDnsName = sh(
                         returnStdout: true,
-                        script: 'terraform output -json efs_dns_name').trim()
+                        script: 'terraform output efs_dns_name').trim()
                     def albDnsName = sh(
                         returnStdout: true,
                         script: 'terraform output jenkins_alb_dns_name').trim()
