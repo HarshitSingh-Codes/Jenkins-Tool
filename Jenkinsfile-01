@@ -65,8 +65,9 @@ pipeline {
                 expression { params.ACTION == 'apply' }
             }
             steps{
-                    sh 'echo "${env.EFS_DNS_NAME}"'
-                    sh 'echo "${env.ALB_DNS_NAME}"'
+                    sh '''
+                        echo "${env.EFS_DNS_NAME}${env.ALB_DNS_NAME}"
+                    '''
                 }
         }
 
