@@ -5,10 +5,6 @@ pipeline {
         choice(name: 'TAGS', choices: ['install', 'uninstall'], description: 'Select tags: install or uninstall')
         choice(name: 'OS', choices: ['ubuntu', 'redhat'], description: 'Select OS family: ubuntu or redhat')
     }
-    environment {
-        EFS_DNS_NAME = ''
-        ALB_DNS_NAME = ''
-    }
     stages { 
         stage('git checkout') { 
           steps {  
